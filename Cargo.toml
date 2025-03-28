@@ -1,0 +1,20 @@
+[package]
+name = "SnipRx"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dotenv = "0.15.0"
+grammers-client = "0.7.0"
+grammers-session = "0.7.0"
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+tokio = { version = "1.44.1", features = ["full"] }
+
+
+[profile.release]
+strip = true        # Remove symbols from binary
+opt-level = 3       # Maximum optimization for speed
+lto = true          # Optimize at link stage ("fat")
+codegen-units = 1   # Reduce parallel codegen to maximize optimizations
+panic = "abort"     # Remove unwind information, reducing binary size and overhead (no backtraces in production)
