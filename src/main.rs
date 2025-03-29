@@ -83,7 +83,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
 
     let ignored_channel_ids: Vec<i64> =
-        vec![2361478254, 1667933245, 1836088744, 2241857744, 2143300041];
+        vec![2361478254, 1667933245, 1836088744, 2241857744, 2143300041, 1903316574];
 
     for (id, value) in channels_map.iter_mut() {
         if ignored_channel_ids.contains(id) {
