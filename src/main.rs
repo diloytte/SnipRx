@@ -1,21 +1,20 @@
+mod forward_message;
 mod load_channels;
 mod load_required_env_variables;
-mod save_json;
 mod process_ignored_channels;
-mod forward_message;
+mod save_json;
 
-use std::{collections::HashMap, hash::Hash, pin::Pin, process::exit, vec};
+use std::{collections::HashMap, vec};
 
 use dotenv::dotenv;
 use forward_message::forward_message;
-use grammers_client::{Client, Config, InvocationError, SignInError, Update};
+use grammers_client::{Client, Config, SignInError, Update};
 use grammers_session::Session;
-use load_channels::{load_channels_and_additional_data, ChannelData};
+use load_channels::load_channels_and_additional_data;
 use load_required_env_variables::load_required_env_variables;
 use save_json::save_json_to_file;
 // use process_ignored_channels::process_ignored_channels;
 use tokio::fs;
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -75,18 +74,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let channels_data_and_additional_data = load_channels_and_additional_data(&client).await?;
 
     let mut channels_map: HashMap<i64, i32> = HashMap::new();
-    
-    channels_data_and_additional_data.0.iter().for_each(|channel|{
-        channels_map.insert(channel.id, 1);
-    });
 
-    let ignored_channel_ids:Vec<i64> = vec![
-        2361478254,
-        1667933245,
-        1836088744,
-        2241857744,
-        2143300041
-    ];
+    channels_data_and_additional_data
+        .0
+        .iter()
+        .for_each(|channel| {
+            channels_map.insert(channel.id, 1);
+        });
+
+    let ignored_channel_ids: Vec<i64> =
+        vec![2361478254, 1667933245, 1836088744, 2241857744, 2143300041];
 
     for (id, value) in channels_map.iter_mut() {
         if ignored_channel_ids.contains(id) {
@@ -106,12 +103,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(Update::NewMessage(message)) if !message.outgoing() => {
                 let message_chat = message.chat();
                 let chat_id = message_chat.id();
-                    let is_channel_active_option = channels_map.get(&chat_id);
-                    if let Some(is_channel_active) = is_channel_active_option {
-                        if *is_channel_active == 1 {
-                            let _ = forward_message(&client, &message, &channels_data_and_additional_data.1.trader_chat).await;
-                        }
+                let is_channel_active_option = channels_map.get(&chat_id);
+                if let Some(is_channel_active) = is_channel_active_option {
+                    if *is_channel_active == 1 {
+                        let _ = forward_message(
+                            &client,
+                            &message,
+                            &channels_data_and_additional_data.1.trader_chat,
+                        )
+                        .await;
                     }
+                }
             }
             Err(e) => eprintln!("Error in listen_for_updates: {}", e),
             _ => {}

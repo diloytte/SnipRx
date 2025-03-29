@@ -1,6 +1,6 @@
+use grammers_client::types::Chat;
 use grammers_client::{Client, InvocationError};
 use serde::Serialize;
-use grammers_client::types::Chat;
 
 #[derive(Debug, Serialize)]
 pub struct ChannelData {
@@ -9,17 +9,19 @@ pub struct ChannelData {
 }
 
 pub struct AdditionalData {
-    pub trader_chat: Chat
+    pub trader_chat: Chat,
 }
 
-pub async fn load_channels_and_additional_data(client: &Client) -> Result<(Vec<ChannelData>,AdditionalData), InvocationError> {
+pub async fn load_channels_and_additional_data(
+    client: &Client,
+) -> Result<(Vec<ChannelData>, AdditionalData), InvocationError> {
     let mut iter_dialogs = client.iter_dialogs();
 
     let dialogs_len = iter_dialogs.total().await.unwrap_or(0);
 
     let mut channels_data: Vec<ChannelData> = vec![];
 
-    let mut trader_chat:Option<Chat> = None;
+    let mut trader_chat: Option<Chat> = None;
 
     for _ in 0..dialogs_len {
         let next_dialog_option = iter_dialogs.next().await?;
@@ -27,18 +29,14 @@ pub async fn load_channels_and_additional_data(client: &Client) -> Result<(Vec<C
             let chat = next_dialog.chat();
             if chat.id() == 6511860356 {
                 trader_chat = Some(chat.clone());
-            } else{
             }
-            match chat {
-                grammers_client::types::Chat::Channel(channel) => {
-                    let channel_name = channel.title();
-                    let channel_id = channel.id();
-                    channels_data.push(ChannelData {
-                        name: channel_name.to_string(),
-                        id: channel_id,
-                    });
-                }
-                _ => {}
+            if let grammers_client::types::Chat::Channel(channel) = chat {
+                let channel_name = channel.title();
+                let channel_id = channel.id();
+                channels_data.push(ChannelData {
+                    name: channel_name.to_string(),
+                    id: channel_id,
+                });
             }
         }
     }
@@ -48,8 +46,8 @@ pub async fn load_channels_and_additional_data(client: &Client) -> Result<(Vec<C
     }
 
     let additional_data = AdditionalData {
-        trader_chat:trader_chat.unwrap()
+        trader_chat: trader_chat.unwrap(),
     };
 
-    Ok((channels_data,additional_data))
+    Ok((channels_data, additional_data))
 }
