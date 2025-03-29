@@ -1,7 +1,6 @@
 mod forward_message;
 mod load_channels;
 mod load_required_env_variables;
-mod process_ignored_channels;
 mod save_json;
 
 use std::{collections::HashMap, vec};
@@ -58,14 +57,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    // println!("Enter channel names to ignore. Split channel names using # sign.");
-    // println!("Example:\n ChannelName1#ChannelName2#ChannelName3");
-
-    // let mut channels_to_ignore = String::new();
-    // std::io::stdin().read_line(&mut channels_to_ignore)?;
-
-    // process_ignored_channels(channels_to_ignore);
-
     let session_data = client.session().save();
     fs::write(session_file, session_data).await?;
 
@@ -82,6 +73,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             channels_map.insert(channel.id, 1);
         });
 
+    //TODO: Make the ignored IDs more dynamic.
+
     let ignored_channel_ids: Vec<i64> =
         vec![2361478254, 1667933245, 1836088744, 2241857744, 2143300041, 1903316574];
 
@@ -92,7 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     let _ = save_json_to_file(&channels_data_and_additional_data.0, "./channels.json");
 
-    let enable_loop = false;
+    let enable_loop = true;
 
     if !enable_loop {
         panic!("Loop not enabled.");
