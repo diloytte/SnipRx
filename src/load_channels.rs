@@ -27,7 +27,7 @@ pub async fn load_channels_and_additional_data(
         let next_dialog_option = iter_dialogs.next().await?;
         if let Some(next_dialog) = next_dialog_option {
             let chat = next_dialog.chat();
-            if chat.id() == 6511860356 {
+            if chat.id() == 7790765304 {
                 trader_chat = Some(chat.clone());
             }
             if let grammers_client::types::Chat::Channel(channel) = chat {

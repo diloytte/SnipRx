@@ -76,7 +76,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //TODO: Make the ignored IDs more dynamic.
 
     let ignored_channel_ids: Vec<i64> =
-        vec![2361478254, 1667933245, 1836088744, 2241857744, 2143300041, 1903316574];
+        vec![2361478254, 1667933245, 1836088744, 2241857744, 2143300041];
 
     for (id, value) in channels_map.iter_mut() {
         if ignored_channel_ids.contains(id) {
@@ -90,6 +90,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if !enable_loop {
         panic!("Loop not enabled.");
     }
+
+    // TODO: if message.outgoing might be overhead, maybe just skip it cuase controller for where to forward message is a channel.
+    // TODO: Open browser if message contains CA.
+
 
     loop {
         match client.next_update().await {
